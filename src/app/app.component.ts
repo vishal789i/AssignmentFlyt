@@ -1,32 +1,162 @@
-import { Component } from '@angular/core';
+import { Component, Host, HostListener } from "@angular/core";
+import { Box } from "./schema/box";
+
 
 @Component({
-  selector: 'app-root',
-  template: `
-    <!--The content below is only a placeholder and can be replaced.-->
-    <div style="text-align:center" class="content">
-      <h1>
-        Welcome to {{title}}!
-      </h1>
-      <span style="display: block">{{ title }} app is running!</span>
-      <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-    </div>
-    <h2>Here are some links to help you start: </h2>
-    <ul>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-      </li>
-      <li>
-        <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-      </li>
-    </ul>
-    <router-outlet></router-outlet>
-  `,
-  styles: []
-})
+  selector : 'app-root',
+  templateUrl : 'app.component.html',
+  styleUrls : ['./app.component.scss']
+}) 
 export class AppComponent {
-  title = 'AssignmentFlyt';
+  title = 'box-move'
+  MAX_BOXES=9;
+  boxes : Array<Box|undefined> = [];
+  lastId = 0;
+  selectedIndex = -1;
+  toggleListener = false;
+
+  constructor() {
+    for(let i = 0; i < this.MAX_BOXES; ++i) {
+      this.boxes.push(undefined);
+    }
+  }
+
+  addBox(event) {
+    for (let i = 0; i < this.MAX_BOXES; i++) {
+      if (this.boxes[i] == undefined) {
+        this.lastId = this.lastId+1;
+        this.boxes[i] = {
+          zindex : this.lastId*2,
+          index : i,
+          id : this.lastId,
+          selected : false
+        }
+        break;
+      }
+    }
+  }
+
+  select(event, i) {
+    if (this.selectedIndex < 0) {
+      this.selectedIndex = i;
+    } else {
+      this.boxes[this.selectedIndex].selected = false;
+      if (this.selectedIndex == i) {
+        this.selectedIndex = -1;
+        return;
+      }
+    }
+    this.boxes[i].selected = !this.boxes[i].selected;
+    this.selectedIndex = i;
+  }
+
+  removeBox(event) {
+    if (this.selectedIndex > -1) {
+      this.boxes[this.selectedIndex] = undefined;
+    }
+    this.selectedIndex = -1;
+  }
+
+  pressW() {
+    console.log(this.selectedIndex);
+
+    if (this.selectedIndex < 0) {
+      return;
+    }
+    if (this.selectedIndex > 2 && this.selectedIndex < 16) {
+      let temp = this.boxes[this.selectedIndex - 3];
+      this.boxes[this.selectedIndex].index = this.selectedIndex - 3;
+      this.boxes[this.selectedIndex-3] = this.boxes[this.selectedIndex];
+      this.boxes[this.selectedIndex] = temp;
+      if (temp !== undefined) {
+        this.boxes[this.selectedIndex].index = this.selectedIndex;
+      }
+      this.selectedIndex -= 3;
+    }
+  }
+
+  pressA(){
+    console.log(this.selectedIndex);
+
+    if(this.selectedIndex < 0) {
+      return;
+    }
+    if(this.selectedIndex > 0){
+      let temp = this.boxes[this.selectedIndex-1]
+      this.boxes[this.selectedIndex].index = this.selectedIndex-1;
+      this.boxes[this.selectedIndex-1] = this.boxes[this.selectedIndex];
+      this.boxes[this.selectedIndex] = temp;
+      if(temp !== undefined) {
+        this.boxes[this.selectedIndex].index = this.selectedIndex;
+      }
+      this.selectedIndex -= 1
+    }
+  }
+
+
+
+  pressS(){
+    console.log(this.selectedIndex);
+    if(this.selectedIndex < 0 && this.selectedIndex > 5) {
+      return;
+    }
+    if(this.selectedIndex < 6){
+      let temp = this.boxes[this.selectedIndex+3]
+      this.boxes[this.selectedIndex].index = this.selectedIndex+4;
+      this.boxes[this.selectedIndex+3] = this.boxes[this.selectedIndex];
+      this.boxes[this.selectedIndex] = temp;
+      if(temp !== undefined) {
+        this.boxes[this.selectedIndex].index = this.selectedIndex;
+      }
+      this.selectedIndex += 3;
+    }
+  }
+
+  pressD(){
+    console.log(this.selectedIndex);
+    if(this.selectedIndex < 0) {
+      return;
+
+    }
+    if(this.selectedIndex < 8 ) {
+      let temp = this.boxes[this.selectedIndex+1];
+      this.boxes[this.selectedIndex].index = this.selectedIndex+1;
+      this.boxes[this.selectedIndex+1] = this.boxes[this.selectedIndex];
+      this.boxes[this.selectedIndex] = temp;
+      if(temp !== undefined) {
+        this.boxes[this.selectedIndex].index = this.selectedIndex;
+      }
+      this.selectedIndex += 1;
+    }
+  }
+
+
+  toggleListenerFunc(event){
+    this.toggleListener=!this.toggleListener;
+    return (this.toggleListener);
+  }
+
+  @HostListener('window:keydown',['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if(!this.toggleListener) {
+      if(event.key.toUpperCase() == 'W' || event.key == 'ArrowUp') {
+        this.pressW();
+      }
+      else if(event.key.toUpperCase() == 'A' || event.key == 'ArrowLeft') {
+        this.pressA();
+      }
+      else if(event.key.toUpperCase() == 'S' || event.key == 'ArrowDown') {
+        this.pressS();
+      }
+      else if(event.key.toUpperCase() == 'D' || event.key == 'ArrowRight') {
+        this.pressD();
+      }
+      else if(event.key == 'Delete') {
+        this.removeBox(event);
+      }
+    }
+    else {
+      return;
+    } 
+  }
 }

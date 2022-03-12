@@ -1,0 +1,21 @@
+<h3 style = "text-align: center;"> Assignment : Box Generator</h3>
+<div class="window">
+    <div class="container">
+        <ng-container *ngFor="let box of boxes">
+            <ng-container *ngIf="box !== undefined">
+                <div [ngClass]="{'clicked': box.selected}" class="box" (click)="select($event , box.index)">
+                    <span class="number">
+                      {{box.id}}
+                    </span>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="box === undefined">
+                <div class="emptybox"></div>
+            </ng-container>
+        </ng-container>
+    </div>
+    
+    <button class="add-box" (click)="addBox($event)"> Add Boxes </button>
+    <button class="remove-box" (click)="removeBox($event)"> Remove Boxes </button>
+    <button class="toggle-listener disable-box" (click)="toggleListenerFunc($event)"> Disable listener </button>
+</div>
